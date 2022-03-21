@@ -1,8 +1,11 @@
 package jpabook.jpashop.domain;
 
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.aspectj.weaver.ast.Or;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +16,7 @@ import java.util.List;
 @Table(name = "orders")
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
 
     @Id @GeneratedValue
@@ -32,6 +36,7 @@ public class Order {
     private Delivery delivery;
 
     private LocalDateTime orderDate;
+
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;//주문상태
@@ -53,5 +58,42 @@ public class Order {
         delivery.setOrder(this);
     }
 
+    //생성 매서드
+    public static Order createOrder(Member member,Delivery delivery,OrderItem... orderItems){
+        Order order = new Order();
+        order.setMember(member);
+        order.setDelivery(delivery);
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem);
+        }
+        order.setStatus(OrderStatus.ORDER);
+        order.setOrderDate(LocalDateTime.now());
+        return order;
+    }
+
+    //비지니스 로직
+
+    /**
+     * order cancel
+     */
+
+    public void cancel() {
+        if (delivery.getDeliveryStatus() == DeliveryStatus.COMP) {
+            throw new IllegalStateException("이미 배송완료된 상품입니다.");
+        }
+
+        this.setStatus(OrderStatus.CANCEL);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel();
+        }
+    }
+
+    //조회로직
+    public int getTotalPrice() {
+        return orderItems
+                .stream()
+                .mapToInt(OrderItem::getTotalPrice)
+                .sum();
+    }
 
 }
