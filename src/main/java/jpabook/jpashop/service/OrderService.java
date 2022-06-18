@@ -1,14 +1,12 @@
 package jpabook.jpashop.service;
 
 
-import jpabook.jpashop.domain.Delivery;
-import jpabook.jpashop.domain.Member;
-import jpabook.jpashop.domain.Order;
-import jpabook.jpashop.domain.OrderItem;
+import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.ItemRepository;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.OrderSearch;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +38,7 @@ public class OrderService {
         //배송정보
         Delivery delivery = new Delivery();
         delivery.setAddress(member.getAddress());
+        delivery.setDeliveryStatus(DeliveryStatus.READY);
 
         //주문아이템 생성
         OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
@@ -49,6 +48,7 @@ public class OrderService {
         //저장
         orderRepository.save(order);
         return order.getId();
+
 
     }
 
@@ -62,8 +62,9 @@ public class OrderService {
 
     }
 
-    //검색
-//    public List<Order> findOrders(OrderSearch orderSearch) {
-//        return orderRepository.findAll(orderSearch);
-//    }
+
+
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAllByString(orderSearch);
+    }
 }

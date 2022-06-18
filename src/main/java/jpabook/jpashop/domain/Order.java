@@ -23,9 +23,9 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-
     private Member member;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
@@ -66,6 +66,7 @@ public class Order {
         for (OrderItem orderItem : orderItems) {
             order.addOrderItem(orderItem);
         }
+
         order.setStatus(OrderStatus.ORDER);
         order.setOrderDate(LocalDateTime.now());
         return order;
@@ -81,7 +82,6 @@ public class Order {
         if (delivery.getDeliveryStatus() == DeliveryStatus.COMP) {
             throw new IllegalStateException("이미 배송완료된 상품입니다.");
         }
-
         this.setStatus(OrderStatus.CANCEL);
         for (OrderItem orderItem : orderItems) {
             orderItem.cancel();
