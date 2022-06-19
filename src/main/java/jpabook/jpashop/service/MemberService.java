@@ -16,9 +16,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-
-
-
     /*
      * 조인
      * */
@@ -41,5 +38,15 @@ public class MemberService {
 
     public List<Member> findMembers() {
         return memberRepository.findAll();
+    }
+
+    @Transactional
+    public void update(Long id, String name) {
+        Member one = memberRepository.findOne(id);
+        one.setName(name);
+    }
+
+    public Member findOne(Long id) {
+        return memberRepository.findOne(id);
     }
 }
